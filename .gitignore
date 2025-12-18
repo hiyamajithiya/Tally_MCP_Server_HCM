@@ -1,0 +1,37 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+
+# TypeScript cache
+*.tsbuildinfo
+
+# Claude settings
+.claude/
+
+# Tally company data (DO NOT COMMIT - contains sensitive business data)
+HIMANSHU MAJITHIYA*/
+*.1800
+*.TSF
+*.rar
+TBK*.001
