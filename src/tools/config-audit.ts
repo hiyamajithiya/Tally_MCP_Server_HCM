@@ -3,6 +3,7 @@
 
 import { TallyConnection } from '../tally/connection.js';
 import { TallyRequests } from '../tally/requests.js';
+import { escapeXml } from '../utils/xml.js';
 import { TallyResponse } from '../types/tally.js';
 
 // Standard Group Names in Tally
@@ -364,7 +365,7 @@ export class ConfigAuditTools {
 
       // Check if GST ledgers are under correct group
       if ((name.includes('igst') || name.includes('cgst') || name.includes('sgst')) &&
-          !this.extractString(ledger.PARENT).toLowerCase().includes('duties')) {
+        !this.extractString(ledger.PARENT).toLowerCase().includes('duties')) {
         issues.push({
           id: `GST_WRONG_GROUP_${ledger.NAME}`,
           category: 'GST',
@@ -1022,7 +1023,7 @@ export class ConfigAuditTools {
 
   // Create ledger in Tally
   private async createLedger(name: string, details: any, companyName?: string): Promise<any> {
-    const companyVar = companyName ? `<SVCURRENTCOMPANY>${companyName}</SVCURRENTCOMPANY>` : '';
+    const companyVar = companyName ? `<SVCURRENTCOMPANY>${escapeXml(companyName)}</SVCURRENTCOMPANY>` : '';
 
     const xml = `<ENVELOPE>
       <HEADER>
@@ -1039,10 +1040,11 @@ export class ConfigAuditTools {
         </DESC>
         <DATA>
           <TALLYMESSAGE>
-            <LEDGER NAME="${name}" ACTION="Create">
-              <NAME>${name}</NAME>
-              <PARENT>${details.parent || 'Sundry Creditors'}</PARENT>
-              ${details.typeOfDuty ? `<TYPEOFDUTY>${details.typeOfDuty}</TYPEOFDUTY>` : ''}
+            <LEDGER NAME="${escapeXml(name)}" ACTION="Create">
+              <NAME>${escapeXml(name)}</NAME>
+              <PARENT>${escapeXml(details.parent || 'Sundry Creditors')}</PARENT>
+              ${details.typeOfDuty ? `<TYPEOFDUTY>${escapeXml(details.typeOfDuty)}</TYPEOFDUTY>` : ''}
+              ${details.tdsSection ? `<TDSNATURE>${escapeXml(details.tdsSection)}</TDSNATURE>` : ''}
             </LEDGER>
           </TALLYMESSAGE>
         </DATA>
@@ -1054,7 +1056,7 @@ export class ConfigAuditTools {
 
   // Regroup ledger
   private async regroupLedger(ledgerName: string, newParent: string, companyName?: string): Promise<any> {
-    const companyVar = companyName ? `<SVCURRENTCOMPANY>${companyName}</SVCURRENTCOMPANY>` : '';
+    const companyVar = companyName ? `<SVCURRENTCOMPANY>${escapeXml(companyName)}</SVCURRENTCOMPANY>` : '';
 
     const xml = `<ENVELOPE>
       <HEADER>
@@ -1071,9 +1073,9 @@ export class ConfigAuditTools {
         </DESC>
         <DATA>
           <TALLYMESSAGE>
-            <LEDGER NAME="${ledgerName}" ACTION="Alter">
-              <NAME>${ledgerName}</NAME>
-              <PARENT>${newParent}</PARENT>
+            <LEDGER NAME="${escapeXml(ledgerName)}" ACTION="Alter">
+              <NAME>${escapeXml(ledgerName)}</NAME>
+              <PARENT>${escapeXml(newParent)}</PARENT>
             </LEDGER>
           </TALLYMESSAGE>
         </DATA>
@@ -1085,7 +1087,7 @@ export class ConfigAuditTools {
 
   // Rename ledger
   private async renameLedger(oldName: string, newName: string, companyName?: string): Promise<any> {
-    const companyVar = companyName ? `<SVCURRENTCOMPANY>${companyName}</SVCURRENTCOMPANY>` : '';
+    const companyVar = companyName ? `<SVCURRENTCOMPANY>${escapeXml(companyName)}</SVCURRENTCOMPANY>` : '';
 
     const xml = `<ENVELOPE>
       <HEADER>
@@ -1102,9 +1104,9 @@ export class ConfigAuditTools {
         </DESC>
         <DATA>
           <TALLYMESSAGE>
-            <LEDGER NAME="${oldName}" ACTION="Alter">
-              <NAME>${newName}</NAME>
-              <OLDNAME>${oldName}</OLDNAME>
+            <LEDGER NAME="${escapeXml(oldName)}" ACTION="Alter">
+              <NAME>${escapeXml(newName)}</NAME>
+              <OLDNAME>${escapeXml(oldName)}</OLDNAME>
             </LEDGER>
           </TALLYMESSAGE>
         </DATA>
@@ -1116,7 +1118,7 @@ export class ConfigAuditTools {
 
   // Update ledger GST details
   private async updateLedgerGST(ledgerName: string, gstDetails: any, companyName?: string): Promise<any> {
-    const companyVar = companyName ? `<SVCURRENTCOMPANY>${companyName}</SVCURRENTCOMPANY>` : '';
+    const companyVar = companyName ? `<SVCURRENTCOMPANY>${escapeXml(companyName)}</SVCURRENTCOMPANY>` : '';
 
     const xml = `<ENVELOPE>
       <HEADER>
@@ -1133,8 +1135,8 @@ export class ConfigAuditTools {
         </DESC>
         <DATA>
           <TALLYMESSAGE>
-            <LEDGER NAME="${ledgerName}" ACTION="Alter">
-              <NAME>${ledgerName}</NAME>
+            <LEDGER NAME="${escapeXml(ledgerName)}" ACTION="Alter">
+              <NAME>${escapeXml(ledgerName)}</NAME>
               <GSTAPPLICABLE>Applicable</GSTAPPLICABLE>
               ${gstDetails.gstRate ? `<GSTRATE>${gstDetails.gstRate}</GSTRATE>` : ''}
             </LEDGER>
@@ -1148,7 +1150,7 @@ export class ConfigAuditTools {
 
   // Update ledger TDS details
   private async updateLedgerTDS(ledgerName: string, tdsDetails: any, companyName?: string): Promise<any> {
-    const companyVar = companyName ? `<SVCURRENTCOMPANY>${companyName}</SVCURRENTCOMPANY>` : '';
+    const companyVar = companyName ? `<SVCURRENTCOMPANY>${escapeXml(companyName)}</SVCURRENTCOMPANY>` : '';
 
     const xml = `<ENVELOPE>
       <HEADER>
@@ -1165,10 +1167,10 @@ export class ConfigAuditTools {
         </DESC>
         <DATA>
           <TALLYMESSAGE>
-            <LEDGER NAME="${ledgerName}" ACTION="Alter">
-              <NAME>${ledgerName}</NAME>
+            <LEDGER NAME="${escapeXml(ledgerName)}" ACTION="Alter">
+              <NAME>${escapeXml(ledgerName)}</NAME>
               <ISTDSAPPLICABLE>Yes</ISTDSAPPLICABLE>
-              ${tdsDetails.tdsSection ? `<TDSNATURE>${tdsDetails.tdsSection}</TDSNATURE>` : ''}
+              ${tdsDetails.tdsSection ? `<TDSNATURE>${escapeXml(tdsDetails.tdsSection)}</TDSNATURE>` : ''}
             </LEDGER>
           </TALLYMESSAGE>
         </DATA>

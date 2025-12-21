@@ -1,12 +1,14 @@
 // TDL Request Builders for various Tally data extractions
 // These are optimized for Indian compliance requirements
 
+import { escapeXml } from '../utils/xml.js';
+
 export class TallyRequests {
 
   // ==================== MASTER DATA REQUESTS ====================
 
   static getLedgers(companyName?: string): string {
-    const companyVar = companyName ? `<SVCURRENTCOMPANY>${companyName}</SVCURRENTCOMPANY>` : '';
+    const companyVar = companyName ? `<SVCURRENTCOMPANY>${escapeXml(companyName)}</SVCURRENTCOMPANY>` : '';
     return `<ENVELOPE>
       <HEADER>
         <VERSION>1</VERSION>
@@ -34,7 +36,7 @@ export class TallyRequests {
   }
 
   static getLedgerDetails(ledgerName: string, companyName?: string): string {
-    const companyVar = companyName ? `<SVCURRENTCOMPANY>${companyName}</SVCURRENTCOMPANY>` : '';
+    const companyVar = companyName ? `<SVCURRENTCOMPANY>${escapeXml(companyName)}</SVCURRENTCOMPANY>` : '';
     return `<ENVELOPE>
       <HEADER>
         <VERSION>1</VERSION>
@@ -47,7 +49,7 @@ export class TallyRequests {
           <STATICVARIABLES>
             <SVEXPORTFORMAT>$$SysName:XML</SVEXPORTFORMAT>
             ${companyVar}
-            <SVLEDGERNAME>${ledgerName}</SVLEDGERNAME>
+            <SVLEDGERNAME>${escapeXml(ledgerName)}</SVLEDGERNAME>
           </STATICVARIABLES>
           <TDL>
             <TDLMESSAGE>
@@ -62,7 +64,7 @@ export class TallyRequests {
   }
 
   static getStockItems(companyName?: string): string {
-    const companyVar = companyName ? `<SVCURRENTCOMPANY>${companyName}</SVCURRENTCOMPANY>` : '';
+    const companyVar = companyName ? `<SVCURRENTCOMPANY>${escapeXml(companyName)}</SVCURRENTCOMPANY>` : '';
     return `<ENVELOPE>
       <HEADER>
         <VERSION>1</VERSION>
@@ -90,7 +92,7 @@ export class TallyRequests {
   }
 
   static getGroups(companyName?: string): string {
-    const companyVar = companyName ? `<SVCURRENTCOMPANY>${companyName}</SVCURRENTCOMPANY>` : '';
+    const companyVar = companyName ? `<SVCURRENTCOMPANY>${escapeXml(companyName)}</SVCURRENTCOMPANY>` : '';
     return `<ENVELOPE>
       <HEADER>
         <VERSION>1</VERSION>
@@ -120,8 +122,8 @@ export class TallyRequests {
   // ==================== VOUCHER REQUESTS ====================
 
   static getVouchers(fromDate: string, toDate: string, voucherType?: string, companyName?: string): string {
-    const companyVar = companyName ? `<SVCURRENTCOMPANY>${companyName}</SVCURRENTCOMPANY>` : '';
-    const voucherTypeFilter = voucherType ? `<VOUCHERTYPENAME>${voucherType}</VOUCHERTYPENAME>` : '';
+    const companyVar = companyName ? `<SVCURRENTCOMPANY>${escapeXml(companyName)}</SVCURRENTCOMPANY>` : '';
+    const voucherTypeFilter = voucherType ? `<VOUCHERTYPENAME>${escapeXml(voucherType)}</VOUCHERTYPENAME>` : '';
 
     return `<ENVELOPE>
       <HEADER>
@@ -143,7 +145,7 @@ export class TallyRequests {
             <TDLMESSAGE>
               <COLLECTION NAME="VoucherCollection">
                 <TYPE>Voucher</TYPE>
-                <CHILDOF>${voucherType || ''}</CHILDOF>
+                <CHILDOF>${escapeXml(voucherType) || ''}</CHILDOF>
                 <FETCH>*, ALLLEDGERENTRIES.*, ALLINVENTORYENTRIES.*, BILLALLOCATIONS.*</FETCH>
               </COLLECTION>
             </TDLMESSAGE>
@@ -199,7 +201,7 @@ export class TallyRequests {
 
   // TallyPrime 6.x compatible: Export Sales Vouchers using Voucher Collection with FETCH
   static getGSTSalesRegister(fromDate: string, toDate: string, companyName?: string): string {
-    const companyVar = companyName ? `<SVCURRENTCOMPANY>${companyName}</SVCURRENTCOMPANY>` : '';
+    const companyVar = companyName ? `<SVCURRENTCOMPANY>${escapeXml(companyName)}</SVCURRENTCOMPANY>` : '';
     const fromDateTally = this.formatDateForTally(fromDate);
     const toDateTally = this.formatDateForTally(toDate);
 
@@ -233,7 +235,7 @@ ${companyVar}
 
   // TallyPrime 6.x compatible: Export All Vouchers using Voucher Collection with FETCH
   static getAllVouchers(fromDate: string, toDate: string, companyName?: string): string {
-    const companyVar = companyName ? `<SVCURRENTCOMPANY>${companyName}</SVCURRENTCOMPANY>` : '';
+    const companyVar = companyName ? `<SVCURRENTCOMPANY>${escapeXml(companyName)}</SVCURRENTCOMPANY>` : '';
     const fromDateTally = this.formatDateForTally(fromDate);
     const toDateTally = this.formatDateForTally(toDate);
 
@@ -267,7 +269,7 @@ ${companyVar}
 
   // TallyPrime 6.x: Using Collection with NATIVEMETHOD (working version from earlier session)
   static getVouchersCollection(fromDate: string, toDate: string, companyName?: string): string {
-    const companyVar = companyName ? `<SVCURRENTCOMPANY>${companyName}</SVCURRENTCOMPANY>` : '';
+    const companyVar = companyName ? `<SVCURRENTCOMPANY>${escapeXml(companyName)}</SVCURRENTCOMPANY>` : '';
     const fromDateTally = this.formatDateForTally(fromDate);
     const toDateTally = this.formatDateForTally(toDate);
 
@@ -313,7 +315,7 @@ ${companyVar}
 
   // TallyPrime 6.x compatible: Export Purchase Vouchers
   static getGSTPurchaseRegister(fromDate: string, toDate: string, companyName?: string): string {
-    const companyVar = companyName ? `<SVCURRENTCOMPANY>${companyName}</SVCURRENTCOMPANY>` : '';
+    const companyVar = companyName ? `<SVCURRENTCOMPANY>${escapeXml(companyName)}</SVCURRENTCOMPANY>` : '';
     const fromDateTally = this.formatDateForTally(fromDate);
     const toDateTally = this.formatDateForTally(toDate);
 
@@ -339,7 +341,7 @@ ${companyVar}
   }
 
   static getGSTR1Summary(fromDate: string, toDate: string, companyName?: string): string {
-    const companyVar = companyName ? `<SVCURRENTCOMPANY>${companyName}</SVCURRENTCOMPANY>` : '';
+    const companyVar = companyName ? `<SVCURRENTCOMPANY>${escapeXml(companyName)}</SVCURRENTCOMPANY>` : '';
     return `<ENVELOPE>
       <HEADER>
         <VERSION>1</VERSION>
@@ -362,7 +364,7 @@ ${companyVar}
   }
 
   static getGSTR3BSummary(fromDate: string, toDate: string, companyName?: string): string {
-    const companyVar = companyName ? `<SVCURRENTCOMPANY>${companyName}</SVCURRENTCOMPANY>` : '';
+    const companyVar = companyName ? `<SVCURRENTCOMPANY>${escapeXml(companyName)}</SVCURRENTCOMPANY>` : '';
     return `<ENVELOPE>
       <HEADER>
         <VERSION>1</VERSION>
@@ -384,7 +386,7 @@ ${companyVar}
   }
 
   static getHSNSummary(fromDate: string, toDate: string, companyName?: string): string {
-    const companyVar = companyName ? `<SVCURRENTCOMPANY>${companyName}</SVCURRENTCOMPANY>` : '';
+    const companyVar = companyName ? `<SVCURRENTCOMPANY>${escapeXml(companyName)}</SVCURRENTCOMPANY>` : '';
     return `<ENVELOPE>
       <HEADER>
         <VERSION>1</VERSION>
@@ -418,7 +420,7 @@ ${companyVar}
   // ==================== TDS SPECIFIC REQUESTS ====================
 
   static getTDSTransactions(fromDate: string, toDate: string, companyName?: string): string {
-    const companyVar = companyName ? `<SVCURRENTCOMPANY>${companyName}</SVCURRENTCOMPANY>` : '';
+    const companyVar = companyName ? `<SVCURRENTCOMPANY>${escapeXml(companyName)}</SVCURRENTCOMPANY>` : '';
     return `<ENVELOPE>
       <HEADER>
         <VERSION>1</VERSION>
@@ -450,7 +452,7 @@ ${companyVar}
   }
 
   static getTDSPayableReport(fromDate: string, toDate: string, companyName?: string): string {
-    const companyVar = companyName ? `<SVCURRENTCOMPANY>${companyName}</SVCURRENTCOMPANY>` : '';
+    const companyVar = companyName ? `<SVCURRENTCOMPANY>${escapeXml(companyName)}</SVCURRENTCOMPANY>` : '';
     return `<ENVELOPE>
       <HEADER>
         <VERSION>1</VERSION>
@@ -485,7 +487,7 @@ ${companyVar}
   // ==================== BANK RECONCILIATION REQUESTS ====================
 
   static getBankTransactions(bankLedgerName: string, fromDate: string, toDate: string, companyName?: string): string {
-    const companyVar = companyName ? `<SVCURRENTCOMPANY>${companyName}</SVCURRENTCOMPANY>` : '';
+    const companyVar = companyName ? `<SVCURRENTCOMPANY>${escapeXml(companyName)}</SVCURRENTCOMPANY>` : '';
     return `<ENVELOPE>
       <HEADER>
         <VERSION>1</VERSION>
@@ -500,7 +502,7 @@ ${companyVar}
             ${companyVar}
             <SVFROMDATE>${fromDate}</SVFROMDATE>
             <SVTODATE>${toDate}</SVTODATE>
-            <SVLEDGERNAME>${bankLedgerName}</SVLEDGERNAME>
+            <SVLEDGERNAME>${escapeXml(bankLedgerName)}</SVLEDGERNAME>
           </STATICVARIABLES>
           <TDL>
             <TDLMESSAGE>
@@ -509,7 +511,7 @@ ${companyVar}
                 <FILTER>HasBankLedger</FILTER>
                 <FETCH>DATE, VOUCHERNUMBER, VOUCHERTYPENAME, NARRATION, ALLLEDGERENTRIES.*, BANKALLOCATIONS.*</FETCH>
               </COLLECTION>
-              <SYSTEM TYPE="Formulae" NAME="HasBankLedger">$$FilterContains:$ALLLEDGERENTRIES[LEDGERNAME].LEDGERNAME:"${bankLedgerName}"</SYSTEM>
+              <SYSTEM TYPE="Formulae" NAME="HasBankLedger">$$FilterContains:$ALLLEDGERENTRIES[LEDGERNAME].LEDGERNAME:"${escapeXml(bankLedgerName)}"</SYSTEM>
             </TDLMESSAGE>
           </TDL>
         </DESC>
@@ -518,7 +520,7 @@ ${companyVar}
   }
 
   static getBankReconciliation(bankLedgerName: string, asOnDate: string, companyName?: string): string {
-    const companyVar = companyName ? `<SVCURRENTCOMPANY>${companyName}</SVCURRENTCOMPANY>` : '';
+    const companyVar = companyName ? `<SVCURRENTCOMPANY>${escapeXml(companyName)}</SVCURRENTCOMPANY>` : '';
     return `<ENVELOPE>
       <HEADER>
         <VERSION>1</VERSION>
@@ -532,7 +534,7 @@ ${companyVar}
             <SVEXPORTFORMAT>$$SysName:XML</SVEXPORTFORMAT>
             ${companyVar}
             <SVTODATE>${asOnDate}</SVTODATE>
-            <SVLEDGERNAME>${bankLedgerName}</SVLEDGERNAME>
+            <SVLEDGERNAME>${escapeXml(bankLedgerName)}</SVLEDGERNAME>
           </STATICVARIABLES>
         </DESC>
       </BODY>
@@ -540,7 +542,7 @@ ${companyVar}
   }
 
   static getBankLedgers(companyName?: string): string {
-    const companyVar = companyName ? `<SVCURRENTCOMPANY>${companyName}</SVCURRENTCOMPANY>` : '';
+    const companyVar = companyName ? `<SVCURRENTCOMPANY>${escapeXml(companyName)}</SVCURRENTCOMPANY>` : '';
     return `<ENVELOPE>
       <HEADER>
         <VERSION>1</VERSION>
@@ -571,7 +573,7 @@ ${companyVar}
   // ==================== TAX AUDIT (SECTION 44AB) REQUESTS ====================
 
   static getCashTransactionsAboveLimit(fromDate: string, toDate: string, limit: number = 10000, companyName?: string): string {
-    const companyVar = companyName ? `<SVCURRENTCOMPANY>${companyName}</SVCURRENTCOMPANY>` : '';
+    const companyVar = companyName ? `<SVCURRENTCOMPANY>${escapeXml(companyName)}</SVCURRENTCOMPANY>` : '';
     return `<ENVELOPE>
       <HEADER>
         <VERSION>1</VERSION>
@@ -608,7 +610,7 @@ ${companyVar}
   }
 
   static getCapitalGoodsRegister(fromDate: string, toDate: string, companyName?: string): string {
-    const companyVar = companyName ? `<SVCURRENTCOMPANY>${companyName}</SVCURRENTCOMPANY>` : '';
+    const companyVar = companyName ? `<SVCURRENTCOMPANY>${escapeXml(companyName)}</SVCURRENTCOMPANY>` : '';
     return `<ENVELOPE>
       <HEADER>
         <VERSION>1</VERSION>
@@ -639,7 +641,7 @@ ${companyVar}
   }
 
   static getLoanAndAdvances(fromDate: string, toDate: string, companyName?: string): string {
-    const companyVar = companyName ? `<SVCURRENTCOMPANY>${companyName}</SVCURRENTCOMPANY>` : '';
+    const companyVar = companyName ? `<SVCURRENTCOMPANY>${escapeXml(companyName)}</SVCURRENTCOMPANY>` : '';
     return `<ENVELOPE>
       <HEADER>
         <VERSION>1</VERSION>
@@ -672,7 +674,7 @@ ${companyVar}
   // ==================== FINANCIAL STATEMENTS REQUESTS ====================
 
   static getTrialBalance(fromDate: string, toDate: string, companyName?: string): string {
-    const companyVar = companyName ? `<SVCURRENTCOMPANY>${companyName}</SVCURRENTCOMPANY>` : '';
+    const companyVar = companyName ? `<SVCURRENTCOMPANY>${escapeXml(companyName)}</SVCURRENTCOMPANY>` : '';
     return `<ENVELOPE>
       <HEADER>
         <VERSION>1</VERSION>
@@ -695,7 +697,7 @@ ${companyVar}
   }
 
   static getBalanceSheet(asOnDate: string, companyName?: string): string {
-    const companyVar = companyName ? `<SVCURRENTCOMPANY>${companyName}</SVCURRENTCOMPANY>` : '';
+    const companyVar = companyName ? `<SVCURRENTCOMPANY>${escapeXml(companyName)}</SVCURRENTCOMPANY>` : '';
     return `<ENVELOPE>
       <HEADER>
         <VERSION>1</VERSION>
@@ -716,7 +718,7 @@ ${companyVar}
   }
 
   static getProfitAndLoss(fromDate: string, toDate: string, companyName?: string): string {
-    const companyVar = companyName ? `<SVCURRENTCOMPANY>${companyName}</SVCURRENTCOMPANY>` : '';
+    const companyVar = companyName ? `<SVCURRENTCOMPANY>${escapeXml(companyName)}</SVCURRENTCOMPANY>` : '';
     return `<ENVELOPE>
       <HEADER>
         <VERSION>1</VERSION>
@@ -738,7 +740,7 @@ ${companyVar}
   }
 
   static getCashFlow(fromDate: string, toDate: string, companyName?: string): string {
-    const companyVar = companyName ? `<SVCURRENTCOMPANY>${companyName}</SVCURRENTCOMPANY>` : '';
+    const companyVar = companyName ? `<SVCURRENTCOMPANY>${escapeXml(companyName)}</SVCURRENTCOMPANY>` : '';
     return `<ENVELOPE>
       <HEADER>
         <VERSION>1</VERSION>
@@ -760,7 +762,7 @@ ${companyVar}
   }
 
   static getFundFlow(fromDate: string, toDate: string, companyName?: string): string {
-    const companyVar = companyName ? `<SVCURRENTCOMPANY>${companyName}</SVCURRENTCOMPANY>` : '';
+    const companyVar = companyName ? `<SVCURRENTCOMPANY>${escapeXml(companyName)}</SVCURRENTCOMPANY>` : '';
     return `<ENVELOPE>
       <HEADER>
         <VERSION>1</VERSION>
@@ -784,7 +786,7 @@ ${companyVar}
   // ==================== AGING ANALYSIS REQUESTS ====================
 
   static getReceivablesAging(asOnDate: string, companyName?: string): string {
-    const companyVar = companyName ? `<SVCURRENTCOMPANY>${companyName}</SVCURRENTCOMPANY>` : '';
+    const companyVar = companyName ? `<SVCURRENTCOMPANY>${escapeXml(companyName)}</SVCURRENTCOMPANY>` : '';
     return `<ENVELOPE>
       <HEADER>
         <VERSION>1</VERSION>
@@ -814,7 +816,7 @@ ${companyVar}
   }
 
   static getPayablesAging(asOnDate: string, companyName?: string): string {
-    const companyVar = companyName ? `<SVCURRENTCOMPANY>${companyName}</SVCURRENTCOMPANY>` : '';
+    const companyVar = companyName ? `<SVCURRENTCOMPANY>${escapeXml(companyName)}</SVCURRENTCOMPANY>` : '';
     return `<ENVELOPE>
       <HEADER>
         <VERSION>1</VERSION>
@@ -846,7 +848,7 @@ ${companyVar}
   // ==================== AUDIT TRAIL REQUESTS ====================
 
   static getAuditTrail(fromDate: string, toDate: string, companyName?: string): string {
-    const companyVar = companyName ? `<SVCURRENTCOMPANY>${companyName}</SVCURRENTCOMPANY>` : '';
+    const companyVar = companyName ? `<SVCURRENTCOMPANY>${escapeXml(companyName)}</SVCURRENTCOMPANY>` : '';
     return `<ENVELOPE>
       <HEADER>
         <VERSION>1</VERSION>
@@ -878,7 +880,7 @@ ${companyVar}
   // ==================== COMPANIES ACT REQUESTS ====================
 
   static getShareCapitalDetails(companyName?: string): string {
-    const companyVar = companyName ? `<SVCURRENTCOMPANY>${companyName}</SVCURRENTCOMPANY>` : '';
+    const companyVar = companyName ? `<SVCURRENTCOMPANY>${escapeXml(companyName)}</SVCURRENTCOMPANY>` : '';
     return `<ENVELOPE>
       <HEADER>
         <VERSION>1</VERSION>
@@ -907,7 +909,7 @@ ${companyVar}
   }
 
   static getReservesAndSurplus(companyName?: string): string {
-    const companyVar = companyName ? `<SVCURRENTCOMPANY>${companyName}</SVCURRENTCOMPANY>` : '';
+    const companyVar = companyName ? `<SVCURRENTCOMPANY>${escapeXml(companyName)}</SVCURRENTCOMPANY>` : '';
     return `<ENVELOPE>
       <HEADER>
         <VERSION>1</VERSION>
@@ -938,7 +940,7 @@ ${companyVar}
   // ==================== DAYBOOK AND REGISTERS ====================
 
   static getDayBook(date: string, companyName?: string): string {
-    const companyVar = companyName ? `<SVCURRENTCOMPANY>${companyName}</SVCURRENTCOMPANY>` : '';
+    const companyVar = companyName ? `<SVCURRENTCOMPANY>${escapeXml(companyName)}</SVCURRENTCOMPANY>` : '';
     return `<ENVELOPE>
       <HEADER>
         <VERSION>1</VERSION>
@@ -960,7 +962,7 @@ ${companyVar}
   }
 
   static getLedgerVouchers(ledgerName: string, fromDate: string, toDate: string, companyName?: string): string {
-    const companyVar = companyName ? `<SVCURRENTCOMPANY>${companyName}</SVCURRENTCOMPANY>` : '';
+    const companyVar = companyName ? `<SVCURRENTCOMPANY>${escapeXml(companyName)}</SVCURRENTCOMPANY>` : '';
     return `<ENVELOPE>
       <HEADER>
         <VERSION>1</VERSION>
@@ -984,7 +986,7 @@ ${companyVar}
                 <FETCH>DATE, VOUCHERNUMBER, VOUCHERTYPENAME, NARRATION, ALLLEDGERENTRIES.*</FETCH>
               </COLLECTION>
               <SYSTEM TYPE="Formulae" NAME="HasLedger">
-                $$FilterContains:$AllLedgerEntries[LEDGERNAME].LEDGERNAME:"${ledgerName}"
+                $$FilterContains:$AllLedgerEntries[LEDGERNAME].LEDGERNAME:"${escapeXml(ledgerName)}"
               </SYSTEM>
             </TDLMESSAGE>
           </TDL>
@@ -994,7 +996,7 @@ ${companyVar}
   }
 
   static getStockSummary(fromDate: string, toDate: string, companyName?: string): string {
-    const companyVar = companyName ? `<SVCURRENTCOMPANY>${companyName}</SVCURRENTCOMPANY>` : '';
+    const companyVar = companyName ? `<SVCURRENTCOMPANY>${escapeXml(companyName)}</SVCURRENTCOMPANY>` : '';
     return `<ENVELOPE>
       <HEADER>
         <VERSION>1</VERSION>

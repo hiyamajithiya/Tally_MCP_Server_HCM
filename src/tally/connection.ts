@@ -1,6 +1,7 @@
 import axios, { AxiosInstance } from 'axios';
 import { XMLParser, XMLBuilder } from 'fast-xml-parser';
 import { TallyConfig, TallyCompany, TallyResponse } from '../types/tally.js';
+import { escapeXml } from '../utils/xml.js';
 
 export class TallyConnection {
   private config: TallyConfig;
@@ -13,11 +14,12 @@ export class TallyConnection {
     this.client = axios.create({
       baseURL: `http://${config.host}:${config.port}`,
       headers: {
-        'Content-Type': 'application/xml',
+        'Content-Type': 'text/xml;charset=utf-8',
       },
       timeout: 300000, // 5 minutes timeout for large data
       maxContentLength: Infinity,
       maxBodyLength: Infinity,
+      responseType: 'text', // Force text to avoid automatic JSON parsing issues
     });
 
     this.parser = new XMLParser({
@@ -68,8 +70,11 @@ export class TallyConnection {
   async executeRequest(xmlRequest: string): Promise<TallyResponse<any>> {
     try {
       const response = await this.client.post('', xmlRequest);
-      const parsed = this.parser.parse(response.data);
-      return { success: true, data: parsed, rawXml: response.data };
+      // Ensure we're parsing string data
+      const responseData = typeof response.data === 'string' ? response.data : JSON.stringify(response.data);
+      const parsed = this.parser.parse(responseData);
+
+      return { success: true, data: parsed, rawXml: responseData };
     } catch (error: any) {
       return {
         success: false,
@@ -139,7 +144,7 @@ export class TallyConnection {
   }
 
   async setCompany(companyName: string): Promise<TallyResponse<boolean>> {
-    this.config.companyName = companyName;
+    this.config.companyName = companyName; // Store raw name
     return { success: true, data: true };
   }
 
@@ -163,7 +168,7 @@ export class TallyConnection {
 
     let staticVarsXml = '<STATICVARIABLES>\n<SVEXPORTFORMAT>$$SysName:XML</SVEXPORTFORMAT>';
     for (const [key, value] of Object.entries(staticVars)) {
-      staticVarsXml += `\n<${key}>${value}</${key}>`;
+      staticVarsXml += `\n<${key}>${escapeXml(value)}</${key}>`;
     }
     staticVarsXml += '\n</STATICVARIABLES>';
 
