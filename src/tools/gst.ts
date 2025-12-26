@@ -1,6 +1,7 @@
 // GST Tools for GSTR-1, 2A, 2B, 3B Reconciliation
 // Compliance with GST Act requirements
 
+import * as fs from 'fs';
 import { TallyConnection } from '../tally/connection.js';
 import { TallyRequests } from '../tally/requests.js';
 import {
@@ -13,6 +14,7 @@ import {
 
 export class GSTTools {
   private connection: TallyConnection;
+  private LOG_PATH = 'C:/Users/Dell/.gemini/antigravity/brain/f024b5eb-8207-4445-bd7b-1936ab7a695f/debug_gst.log';
 
   constructor(connection: TallyConnection) {
     this.connection = connection;
@@ -105,6 +107,7 @@ export class GSTTools {
 
   // Get GSTR-3B Summary data
   async getGSTR3BData(fromDate: string, toDate: string): Promise<TallyResponse<any>> {
+    fs.appendFileSync(this.LOG_PATH, `\n\n--- Starting GSTR3B Data Fetch for ${fromDate} to ${toDate} ---\n`);
     const companyName = this.connection.getCompanyName();
     const formattedFromDate = this.connection.formatTallyDate(new Date(fromDate));
     const formattedToDate = this.connection.formatTallyDate(new Date(toDate));
@@ -170,12 +173,15 @@ export class GSTTools {
           const isOptional = this.extractString(voucher.ISOPTIONAL || voucher.IsOptional).toLowerCase();
           const isCancelled = this.extractString(voucher.ISCANCELLED || voucher.IsCancelled).toLowerCase();
           if (isOptional === 'yes' || isCancelled === 'yes') {
+            fs.appendFileSync(this.LOG_PATH, `[DEBUG] Skipping voucher (Optional: ${isOptional}, Cancelled: ${isCancelled})\n`);
             continue;
           }
 
           const voucherType = this.extractString(voucher.VOUCHERTYPENAME || voucher.VoucherTypeName).toLowerCase();
           const gstData = this.extractGSTAmounts(voucher);
           const isRCM = this.extractString(voucher.ISREVERSECHARGEAPPLICABLE) === 'Yes';
+
+          fs.appendFileSync(this.LOG_PATH, `[DEBUG] Processing voucher: Type=${voucherType}, Date=${voucher.DATE}, RCM=${isRCM}\n`);
 
           // Process Sales vouchers for Table 3.1
           if (voucherType.includes('sales')) {
@@ -208,6 +214,7 @@ export class GSTTools {
 
           // Process Purchase vouchers for Table 4 (ITC)
           if (voucherType.includes('purchase')) {
+            fs.appendFileSync(this.LOG_PATH, `[DEBUG] Purchase Voucher - GST Data: ${JSON.stringify(gstData)}\n`);
             if (isRCM) {
               gstr3b.table4.itcAvailable.inwardSuppliesRCM.igst += gstData.igst;
               gstr3b.table4.itcAvailable.inwardSuppliesRCM.cgst += gstData.cgst;

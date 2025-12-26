@@ -291,7 +291,7 @@ ${companyVar}
       </STATICVARIABLES>
       <TDL>
         <TDLMESSAGE>
-          <COLLECTION NAME="MyVoucherCollection" ISINITIALIZE="Yes">
+          <COLLECTION NAME="MyVoucherCollection">
             <TYPE>Voucher</TYPE>
             <NATIVEMETHOD>Date</NATIVEMETHOD>
             <NATIVEMETHOD>VoucherNumber</NATIVEMETHOD>
@@ -302,10 +302,15 @@ ${companyVar}
             <NATIVEMETHOD>Reference</NATIVEMETHOD>
             <NATIVEMETHOD>PartyGSTIN</NATIVEMETHOD>
             <NATIVEMETHOD>PlaceOfSupply</NATIVEMETHOD>
+            <NATIVEMETHOD>IsReverseChargeApplicable</NATIVEMETHOD>
+            <NATIVEMETHOD>IRNNumber</NATIVEMETHOD>
+            <NATIVEMETHOD>IRNDate</NATIVEMETHOD>
             <NATIVEMETHOD>IsOptional</NATIVEMETHOD>
             <NATIVEMETHOD>IsCancelled</NATIVEMETHOD>
             <NATIVEMETHOD>AllLedgerEntries</NATIVEMETHOD>
+            <FILTER>MyDateFilter</FILTER>
           </COLLECTION>
+          <SYSTEM TYPE="Formulae" NAME="MyDateFilter">$Date &gt;= $$Date:"${fromDate}" AND $Date &lt;= $$Date:"${toDate}"</SYSTEM>
         </TDLMESSAGE>
       </TDL>
     </DESC>
